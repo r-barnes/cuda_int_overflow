@@ -12,6 +12,10 @@ template = """#include <cxxabi.h>
 #include <string>
 #include <typeinfo>
 
+#include "MySafeInt.hpp"
+
+using namespace rsi;
+
 std::string demangle_helper(const char* mangled)
 {{
   int status;
@@ -30,8 +34,6 @@ int main() {{
 }}
 """
 
-entry_template = '  std::cout << "{a} + {b} = " << demangle(static_cast<{a}>(1) + static_cast<{b}>(1)) << std::endl;'
-
 cpp_types: list[str] = [
     "bool",
     "int8_t",
@@ -42,17 +44,23 @@ cpp_types: list[str] = [
     "uint16_t",
     "uint32_t",
     "uint64_t",
-    "float",
-    "double",
-    "long double",
+    # "float",
+    # "double",
+    # "long double",
 ]
 
+entry_template = '  std::cout << "{a} + {b} = " << demangle(static_cast<{a}>(1) + static_cast<{b}>(1)) << " pod" << std::endl;'
 entry_list = [
-    entry_template.format(a=a, b=b) for a, b in itertools.product(cpp_types, cpp_types)
+    entry_template.format(prefix="a", a=a, b=b) for a, b in itertools.product(cpp_types, cpp_types)
+]
+
+entry_template = '  std::cout << "{a} + {b} = " << demangle(SafeInt(static_cast<{a}>(1)) + SafeInt(static_cast<{b}>(1))) << std::endl;'
+entry_list += [
+    entry_template.format(prefix="b", a=a, b=b) for a, b in itertools.product(cpp_types, cpp_types)
 ]
 
 with tempfile.NamedTemporaryFile(
-    mode="w", suffix=".cpp", delete_on_close=False
+    mode="w", suffix=".cpp", delete_on_close=False, dir="."
 ) as source:
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".exe", delete_on_close=False
