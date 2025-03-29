@@ -271,7 +271,7 @@ for op in arithmetic_operators:
     behaviour_defaults.append(arith_behaviour_default_template.format(op_name=op.name))
     behaviour_defaults.append(arith_accum_behaviour_default_template.format(op_name=op.name))
 
-with open("MySafeInt.hpp", "w") as fout:
+with open("RichardSafeInt.hpp", "w") as fout:
     fout.write(class_template.format(
         behaviour_defaults="\n".join(behaviour_defaults), 
         non_member_operations="\n".join(non_member_operations)))
