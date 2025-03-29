@@ -4,15 +4,16 @@
 #include <random>
 #include <type_traits>
 
+#define RSI_ARITH_BEHAVIOUR_MUL rsi::rsi_arith_behaviour::STANDARD_BUT_NOT_SAME_SIZE
+#define RSI_ARITH_ACCUM_BEHAVIOUR_MUL rsi::rsi_arith_accum_behaviour::NONE
+#define RSI_ALLOW_CONVERSION 0
+
 #include "MySafeInt.hpp"
 
 using namespace rsi;
 
 int main(){
-    auto a = SafeInt(static_cast<int32_t>(23));
-    auto b = SafeInt(static_cast<int32_t>(43));
-    a = 2;
-    // std::array<int, 8> arr = {1,2,3,4,5,6,7,8};
-    // arr[a.value()];
-    a * (int8_t)3;
+    for(int i = 0; i < 20; i+=2){
+        std::cout<<i<<std::endl;
+    }
 }
