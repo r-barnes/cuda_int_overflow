@@ -1,4 +1,5 @@
 // Richard's Safe Int Class
+#include <cstdint>
 #include <ostream>
 
 #define RSI_DEVICE
