@@ -3,9 +3,6 @@
 import itertools
 from dataclasses import dataclass
 
-signs = ["", "u"]
-sizes = [8] #16,32,64]
-
 @dataclass(frozen=True)
 class Op:
     name: str
@@ -56,8 +53,8 @@ template<> struct LargerType<uint64_t> {{ using type = int64_t; }};
 
 enum class rsi_arith_behaviour {{
     STANDARD_BEHAVIOUR,
-    STANDARD_BUT_NOT_SAME_SIZE,
-    SAME_SIZE_PROMOTE_TO_LARGER_SIGNED,
+    STANDARD_BUT_NOT_SAME_SIZE_UNLESS_64,
+    SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64,
     NONE
 }};
 
@@ -75,12 +72,13 @@ enum class rsi_assign_behaviour {{
     NONE
 }};
 
-enum class rsi_bitwise_behaviour {{
-    STANDARD_BEHAVIOUR,
-    STANDARD_BUT_ONLY_UNSIGNED,
-    UNSIGNED_AND_SAME_SIZE,
-    NONE
-}};
+// NOT YET USED
+// enum class rsi_bitwise_behaviour {{
+//     STANDARD_BEHAVIOUR,
+//     STANDARD_BUT_ONLY_UNSIGNED,
+//     UNSIGNED_AND_SAME_SIZE,
+//     NONE
+// }};
 
 template <typename T>
 class SafeInt {{
@@ -194,13 +192,13 @@ template<typename T, typename U>
 RSI_DEVICE constexpr auto operator{op}(const rsi::SafeInt<T>& lhs, const rsi::SafeInt<U>& rhs) {{
     if constexpr (RSI_ARITH_BEHAVIOUR_{op_name} == rsi::rsi_arith_behaviour::STANDARD_BEHAVIOUR) {{
         return rsi::SafeInt(lhs.value() * rhs.value());
-    }} else if constexpr (RSI_ARITH_BEHAVIOUR_{op_name} == rsi::rsi_arith_behaviour::STANDARD_BUT_NOT_SAME_SIZE) {{
-        if constexpr (sizeof(T) == sizeof(U)) {{
+    }} else if constexpr (RSI_ARITH_BEHAVIOUR_{op_name} == rsi::rsi_arith_behaviour::STANDARD_BUT_NOT_SAME_SIZE_UNLESS_64) {{
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {{
             static_assert(false, "Performing {op_name} ({op}) on types of the same size is not allowed.");
         }} else {{
             return rsi::SafeInt(lhs.value() * rhs.value());
         }}
-    }} else if constexpr (RSI_ARITH_BEHAVIOUR_{op_name} == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED){{
+    }} else if constexpr (RSI_ARITH_BEHAVIOUR_{op_name} == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){{
         if constexpr (sizeof(T) == sizeof(U)) {{
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) {op} static_cast<larger>(rhs.value()));

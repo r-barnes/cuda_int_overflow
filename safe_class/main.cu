@@ -12,76 +12,10 @@
         exit(1); \
     }
 
-template <typename T>
-class MySafeInt {
-    static_assert(std::is_same_v<T, uint32_t> || std::is_same_v<T, int32_t>,
-                  "MySafeInt can only hold uint32_t or int32_t");
-    T value = 0;
-
-public:
-    constexpr MySafeInt() = default;
-    __device__ constexpr explicit MySafeInt(T v) : value(v) {}
-
-    __device__ constexpr operator T() const { return value; }
-
-    // Arithmetic operations (except multiplication between MySafeInt types)
-    __device__  constexpr MySafeInt operator+(const MySafeInt& rhs) const { return MySafeInt(value + rhs.value); }
-    __device__  constexpr MySafeInt operator*(const MySafeInt& rhs) const { return MySafeInt(value * rhs.value); }
-    // __device__  constexpr MySafeInt operator-(const MySafeInt& rhs) const { return MySafeInt(value - rhs.value); }
-    // __device__  constexpr MySafeInt operator/(const MySafeInt& rhs) const { return MySafeInt(value / rhs.value); }
-    // __device__  constexpr MySafeInt operator%(const MySafeInt& rhs) const { return MySafeInt(value % rhs.value); }
-
-    // Multiplication is only allowed with fundamental types, never with MySafeInt
-    // template <typename U, typename = std::enable_if_t<std::is_arithmetic_v<U>>>
-    // __device__ constexpr MySafeInt operator*(U rhs) const { return MySafeInt(value * rhs); }
-
-    // Compound assignment operators
-    // __device__ constexpr MySafeInt& operator+=(const MySafeInt& rhs) { value += rhs.value; return *this; }
-    // __device__ constexpr MySafeInt& operator-=(const MySafeInt& rhs) { value -= rhs.value; return *this; }
-    // __device__ constexpr MySafeInt& operator/=(const MySafeInt& rhs) { value /= rhs.value; return *this; }
-    // __device__ constexpr MySafeInt& operator%=(const MySafeInt& rhs) { value %= rhs.value; return *this; }
-
-    // template <typename U, typename = std::enable_if_t<std::is_arithmetic_v<U>>>
-    // __device__ constexpr MySafeInt& operator*=(U rhs) { value *= rhs; return *this; }
-
-    // Increment and decrement operators
-    // __device__ constexpr MySafeInt& operator++() { ++value; return *this; }
-    // __device__ constexpr MySafeInt operator++(int) { MySafeInt tmp(*this); ++value; return tmp; }
-    // __device__ constexpr MySafeInt& operator--() { --value; return *this; }
-    // __device__ constexpr MySafeInt operator--(int) { MySafeInt tmp(*this); --value; return tmp; }
-
-    // Comparison operators
-    // __device__ constexpr bool operator==(const MySafeInt& rhs) const { return value == rhs.value; }
-    // __device__ constexpr bool operator!=(const MySafeInt& rhs) const { return value != rhs.value; }
-    __device__ constexpr bool operator<(const MySafeInt& rhs) const { return value < rhs.value; }
-    __device__ constexpr bool operator<(const int32_t o) const { return value < o; }
-    __device__ constexpr bool operator<(const uint32_t o) const { return value < o; }
-    // __device__ constexpr bool operator<=(const MySafeInt& rhs) const { return value <= rhs.value; }
-    // __device__ constexpr bool operator>(const MySafeInt& rhs) const { return value > rhs.value; }
-    // __device__ constexpr bool operator>=(const MySafeInt& rhs) const { return value >= rhs.value; }
-};
-
-// Non-member multiplication operators for fundamental types
-// template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic_v<U>>>
-// __device__ constexpr MySafeInt<T> operator*(U lhs, const MySafeInt<T>& rhs) {
-//     return MySafeInt<T>(lhs * static_cast<T>(rhs));
-// }
-
-// Explicit non-member operator[] to enable array indexing
-// template <typename T, typename U>
-// constexpr auto& operator[](T* ptr, const MySafeInt<U>& idx) {
-//     return ptr[idx.get()];
-// }
-
-// template <typename T, typename U>
-// constexpr const auto& operator[](const T* ptr, const MySafeInt<U>& idx) {
-//     return ptr[idx.get()];
-// }
-
 
 // Kernel function to multiply two arrays
 __global__ void multiply(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t N) {
-  const auto idx = MySafeInt<uint32_t>(blockIdx.x) * MySafeInt<uint32_t>(blockDim.x) + MySafeInt<uint32_t>(threadIdx.x);
+  const auto idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < N) {
       c[idx] = a[idx] * b[idx];
   }
