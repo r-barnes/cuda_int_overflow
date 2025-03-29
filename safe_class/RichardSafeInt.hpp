@@ -67,8 +67,6 @@ template<> struct LargerType<int16_t> { using type = int32_t; };
 template<> struct LargerType<uint16_t> { using type = int32_t; };
 template<> struct LargerType<int32_t> { using type = int64_t; };
 template<> struct LargerType<uint32_t> { using type = int64_t; };
-template<> struct LargerType<int64_t> { using type = int64_t; };
-template<> struct LargerType<uint64_t> { using type = int64_t; };
 
 }
 
@@ -217,7 +215,7 @@ RSI_DEVICE constexpr auto operator+(const rsi::SafeInt<T>& lhs, const rsi::SafeI
             return rsi::SafeInt(lhs.value() * rhs.value());
         }
     } else if constexpr (RSI_ARITH_BEHAVIOUR_ADD == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){
-        if constexpr (sizeof(T) == sizeof(U)) {
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) + static_cast<larger>(rhs.value()));
         } else {
@@ -283,7 +281,7 @@ RSI_DEVICE constexpr auto operator-(const rsi::SafeInt<T>& lhs, const rsi::SafeI
             return rsi::SafeInt(lhs.value() * rhs.value());
         }
     } else if constexpr (RSI_ARITH_BEHAVIOUR_SUB == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){
-        if constexpr (sizeof(T) == sizeof(U)) {
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) - static_cast<larger>(rhs.value()));
         } else {
@@ -349,7 +347,7 @@ RSI_DEVICE constexpr auto operator/(const rsi::SafeInt<T>& lhs, const rsi::SafeI
             return rsi::SafeInt(lhs.value() * rhs.value());
         }
     } else if constexpr (RSI_ARITH_BEHAVIOUR_DIV == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){
-        if constexpr (sizeof(T) == sizeof(U)) {
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) / static_cast<larger>(rhs.value()));
         } else {
@@ -415,7 +413,7 @@ RSI_DEVICE constexpr auto operator*(const rsi::SafeInt<T>& lhs, const rsi::SafeI
             return rsi::SafeInt(lhs.value() * rhs.value());
         }
     } else if constexpr (RSI_ARITH_BEHAVIOUR_MUL == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){
-        if constexpr (sizeof(T) == sizeof(U)) {
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) * static_cast<larger>(rhs.value()));
         } else {
@@ -481,7 +479,7 @@ RSI_DEVICE constexpr auto operator%(const rsi::SafeInt<T>& lhs, const rsi::SafeI
             return rsi::SafeInt(lhs.value() * rhs.value());
         }
     } else if constexpr (RSI_ARITH_BEHAVIOUR_MOD == rsi::rsi_arith_behaviour::SAME_SIZE_PROMOTE_TO_LARGER_SIGNED_UNLESS_64){
-        if constexpr (sizeof(T) == sizeof(U)) {
+        if constexpr (sizeof(T) == sizeof(U) && sizeof(T) != 8) {
             using larger = rsi::detail::LargerType<T>::type;
             return rsi::SafeInt<larger>(static_cast<larger>(lhs.value()) % static_cast<larger>(rhs.value()));
         } else {
