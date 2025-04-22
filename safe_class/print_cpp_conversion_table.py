@@ -12,7 +12,7 @@ template = """#include <cxxabi.h>
 #include <string>
 #include <typeinfo>
 
-#include "RichardSafeInt.hpp"
+#include "RichSafeInt.hpp"
 
 using namespace rsi;
 

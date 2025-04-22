@@ -16,4 +16,5 @@ int main(){
     for(rsi::SafeInt<int> i = 0; i < 20; i+=2){
         std::cout<<i<<std::endl;
     }
+    int x = rsi::SafeInt<int64_t>(30);
 }
